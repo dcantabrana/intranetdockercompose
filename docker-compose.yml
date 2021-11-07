@@ -1,0 +1,55 @@
+# Versión utilizada
+version: '3'
+
+services: 
+  # servicio de mysql
+  mysql:
+    container_name: mysql
+    build: mysql/
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      # dos volumenes. primero para guardar la bbdd en local y el otro para cargar las bases de datos iniciales que se crean en mysql, este segundo es mas para la primera vez que se ejecuta ya que debe crear estas bd para las app que ponemos en el tomcat.
+    volumes:
+      - ./bbdd/:/var/lib/mysql/
+      - ./sql:/docker-entrypoint-initdb.d/
+    ports:
+      - 3306:3306
+    expose:
+      - '3306'
+  
+    # servicio que le he llamado proyectos en el que esta instalado el ubuntu con su tomcat y su config a través del fichero dockerfile dentro de la carpeta proyectos. esto está todo en el puerto 8082
+  api:
+    container_name: api
+    build: api/
+    ports:
+      - 8082:8080
+
+
+  # phpmyadmin en el puerto 8081
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - 8081:80
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+
+  # tomcat en el puerto 8080
+  # tomcat:
+  #   container_name: tomcat
+  #   depends_on: 
+  #     - mysql
+  #   image: tomcat:latest
+  #   ports:
+  #     - 8080:8080
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     # este volumen es para guardar los datos y recoger inicialmente el ROOT.war
+  #   volumes:
+  #     - ./api-rest/:/usr/local/tomcat/webapps/
+
