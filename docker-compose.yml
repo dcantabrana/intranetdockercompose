@@ -39,6 +39,7 @@ services:
       PMA_HOST: mysql
       MYSQL_ROOT_PASSWORD: root
 
+  
   # tomcat en el puerto 8080
   # tomcat:
   #   container_name: tomcat
